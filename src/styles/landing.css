@@ -1,0 +1,1729 @@
+.landing-page,
+.landing-page * {
+  box-sizing: border-box;
+}
+
+
+.landing-page {
+  position: relative;
+
+  width: 100%;
+  height: 100vh;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  background: #00060f;
+
+  color: #ffffff;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  scroll-behavior: smooth;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 211, 252, 0.5) #00060f;
+}
+
+
+.landing-page::-webkit-scrollbar {
+  width: 7px;
+}
+
+
+.landing-page::-webkit-scrollbar-track {
+  background: #00060f;
+}
+
+
+.landing-page::-webkit-scrollbar-thumb {
+  background: rgba(125, 211, 252, 0.5);
+
+  border-radius: 20px;
+}
+
+
+.landing-page button,
+.landing-page select {
+  font: inherit;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.landing-header {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+
+  height: 96px;
+
+  padding:
+    0 clamp(28px, 6vw, 110px);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  z-index: 100;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 5, 15, 0.8),
+      rgba(0, 5, 15, 0)
+    );
+
+  backdrop-filter: blur(2px);
+}
+
+
+/* Logo */
+
+.landing-logo {
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: clamp(24px, 2vw, 32px);
+
+  font-weight: 800;
+
+  letter-spacing: -1.5px;
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+
+/* Navigation */
+
+.landing-nav {
+  display: flex;
+
+  align-items: center;
+
+  gap: clamp(24px, 3vw, 48px);
+
+  margin-left: auto;
+
+  margin-right: 40px;
+}
+
+
+.landing-nav button {
+  position: relative;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.78);
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  padding: 8px 2px;
+
+  transition:
+    color 0.25s ease;
+}
+
+
+.landing-nav button::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: 0;
+
+  height: 1px;
+
+  background: #7dd3fc;
+
+  box-shadow:
+    0 0 8px rgba(125, 211, 252, 0.8);
+
+  transition:
+    width 0.3s ease;
+}
+
+
+.landing-nav button:hover {
+  color: #ffffff;
+}
+
+
+.landing-nav button:hover::after {
+  width: 100%;
+}
+
+
+/* Language */
+/* CHANGED: the select now lives inside a Netflix-style pill —
+   a translate/globe icon, the current language, and a chevron,
+   all in one rounded dark box. The <select> itself is stripped
+   of its own border/background so the wrapper reads as a single
+   control; the wrapper gets the hover/focus treatment instead. */
+
+.language-select-wrapper {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 120px;
+
+  padding: 10px 14px;
+
+  border-radius: 7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  background: rgba(4, 10, 22, 0.75);
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+
+.language-select-wrapper:hover,
+.language-select-wrapper:focus-within {
+  border-color: rgba(125, 211, 252, 0.5);
+
+  background: rgba(4, 10, 22, 0.92);
+}
+
+
+.language-icon {
+  flex-shrink: 0;
+
+  width: 17px;
+
+  height: 17px;
+
+  color: rgba(255, 255, 255, 0.85);
+}
+
+
+.language-selector {
+  flex: 1;
+
+  min-width: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  outline: none;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  padding: 0;
+
+  appearance: auto;
+}
+
+
+.language-selector option {
+  background: #07101f;
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero-section {
+  position: relative;
+
+  min-height: 100vh;
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  overflow: hidden;
+
+  isolation: isolate;
+}
+
+
+/* Weather slideshow */
+
+.hero-background {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: -4;
+}
+
+
+.weather-slide {
+  position: absolute;
+
+  inset: 0;
+
+  background-size: cover;
+
+  background-position: center;
+
+  opacity: 0;
+
+  transform: scale(1.06);
+
+  transition:
+    opacity 1.5s ease-in-out,
+    transform 7s ease;
+
+  filter:
+    saturate(0.8)
+    contrast(1.05);
+}
+
+
+.weather-slide.active {
+  opacity: 1;
+
+  transform: scale(1);
+}
+
+
+/* Main dark overlay */
+
+.hero-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: -3;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(20, 30, 65, 0.18),
+      rgba(0, 6, 15, 0.75)
+    );
+
+  transition:
+    opacity 0.2s linear;
+}
+
+
+/* Top dark fade */
+/* NEW: darkens the top of the hero image (behind the header) so the
+   logo/nav/label sit over a clearly dark area instead of whatever
+   the slideshow image happens to show. */
+
+.hero-top-fade {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 0;
+
+  height: 40%;
+
+  z-index: -2;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 6, 15, 0.85),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+
+/* Bottom black fade */
+
+.hero-bottom-fade {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 38%;
+
+  z-index: -2;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      #00060f
+    );
+
+  pointer-events: none;
+}
+
+
+/* Hero content */
+/* CHANGED: more top clearance from the fixed header (96px) so the
+   hero-label never crowds the nav row, plus a touch more overall
+   breathing room before the heading starts. */
+
+.hero-content {
+  position: relative;
+
+  z-index: 2;
+
+  width: min(1000px, 90%);
+
+  text-align: center;
+
+  margin-top: 130px;
+}
+
+
+/* Label */
+/* CHANGED: stronger contrast (higher opacity, added weight/shadow)
+   so it reads clearly over bright sky backgrounds instead of
+   washing out near the header. */
+
+.hero-label {
+  margin: 0 0 42px;
+
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  letter-spacing: 5px;
+
+  text-transform: uppercase;
+
+  text-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+
+/* Main heading */
+/* CHANGED: headline now uses Times New Roman instead of the page's
+   default Inter/system-ui stack, with serif fallbacks. */
+
+.hero-content h1 {
+  margin: 0;
+
+  font-family:
+    "Times New Roman",
+    Times,
+    Georgia,
+    serif;
+
+  font-size: clamp(
+    58px,
+    7.5vw,
+    118px
+  );
+
+  line-height: 0.98;
+
+  font-weight: 300;
+
+  letter-spacing: -5px;
+
+  color: #ffffff;
+
+  text-shadow:
+    0 5px 30px rgba(0, 0, 0, 0.4);
+}
+
+
+.hero-content h1 span {
+  color: #dce9f8;
+}
+
+
+/* Description */
+
+.hero-description {
+  width: min(760px, 90%);
+
+  margin:
+    45px auto 0;
+
+  color: rgba(235, 242, 250, 0.78);
+
+  font-size: clamp(16px, 1.3vw, 20px);
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   EXPLORE BUTTON
+   CHANGED: rebuilt as a glass/transparent button. At rest it's a
+   faint frosted panel; on hover a light beam sweeps across it, a
+   soft cyan glow ring appears, and it lifts slightly. Label and
+   arrow are wrapped in their own spans (see landing.tsx) and kept
+   above the shine layer via z-index so the text stays crisp.
+   ========================================================= */
+
+.explore-button {
+  position: relative;
+
+  isolation: isolate;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 16px;
+
+  margin-top: 42px;
+
+  min-width: 280px;
+
+  padding:
+    20px 30px;
+
+  border: 1px solid rgba(255, 255, 255, 0.32);
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  backdrop-filter: blur(10px);
+
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #ffffff;
+
+  font-size: 17px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease,
+    background 0.35s ease;
+}
+
+
+/* Soft gradient glow ring, hidden until hover */
+
+.explore-button::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -1px;
+
+  z-index: 0;
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(125, 211, 252, 0.55),
+      transparent 35%,
+      transparent 65%,
+      rgba(125, 211, 252, 0.55)
+    );
+
+  opacity: 0;
+
+  transition:
+    opacity 0.45s ease;
+}
+
+
+.explore-button:hover::after {
+  opacity: 1;
+}
+
+
+/* Light beam sweep */
+
+.explore-button::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -60%;
+
+  width: 45%;
+
+  height: 100%;
+
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      100deg,
+      transparent,
+      rgba(255, 255, 255, 0.55),
+      transparent
+    );
+
+  transform: skewX(-20deg);
+
+  transition:
+    left 0.85s ease;
+}
+
+
+.explore-button:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(125, 211, 252, 0.7);
+
+  background: rgba(125, 211, 252, 0.08);
+
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.35),
+    0 0 30px rgba(125, 211, 252, 0.22);
+}
+
+
+.explore-button:hover::before {
+  left: 150%;
+}
+
+
+.explore-button-label,
+.explore-button-arrow {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+.explore-button-arrow {
+  font-size: 22px;
+
+  transition:
+    transform 0.3s ease;
+}
+
+
+.explore-button:hover .explore-button-arrow {
+  transform: translateX(6px);
+}
+
+
+/* Scroll indicator */
+
+.scroll-indicator {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin:
+    38px auto 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+
+.scroll-arrow {
+  font-size: 22px;
+
+  animation:
+    scrollBounce 1.8s ease-in-out infinite;
+}
+
+
+@keyframes scrollBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(7px);
+  }
+
+}
+
+
+/* =========================================================
+   GENERAL SECTIONS
+   ========================================================= */
+
+.features-section,
+.faq-section {
+  position: relative;
+
+  min-height: 100vh;
+
+  padding:
+    140px clamp(24px, 8vw, 130px);
+
+  background: #00060f;
+}
+
+
+/* Section heading */
+
+.section-heading {
+  max-width: 800px;
+
+  margin:
+    0 auto 80px;
+
+  text-align: center;
+}
+
+
+.section-label {
+  margin: 0 0 18px;
+
+  color: #7dd3fc;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  letter-spacing: 4px;
+
+  text-transform: uppercase;
+}
+
+
+.section-heading h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(
+    40px,
+    5vw,
+    72px
+  );
+
+  line-height: 1.05;
+
+  font-weight: 300;
+
+  letter-spacing: -2px;
+}
+
+
+.section-heading > p:last-child {
+  margin:
+    25px auto 0;
+
+  max-width: 650px;
+
+  color: rgba(220, 230, 240, 0.58);
+
+  line-height: 1.7;
+
+  font-size: 17px;
+}
+
+
+/* =========================================================
+   FEATURE GRID
+   ========================================================= */
+
+.feature-grid {
+  width: min(1250px, 100%);
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 24px;
+}
+
+
+/* Feature card */
+
+.feature-card {
+  position: relative;
+
+  min-height: 260px;
+
+  padding: 34px;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(12, 24, 43, 0.95),
+      rgba(4, 11, 22, 0.95)
+    );
+
+  border: 1px solid rgba(125, 211, 252, 0.16);
+
+  overflow: hidden;
+
+  isolation: isolate;
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+
+/* Animated electric border */
+
+.feature-card::before {
+  content: "";
+
+  position: absolute;
+
+  inset: -2px;
+
+  border-radius: 20px;
+
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      transparent 245deg,
+      rgba(125, 211, 252, 0.05) 275deg,
+      #7dd3fc 310deg,
+      #ffffff 325deg,
+      #7dd3fc 340deg,
+      transparent 360deg
+    );
+
+  animation:
+    electricRotate 4s linear infinite;
+
+  z-index: -2;
+}
+
+
+/* Card inner background */
+
+.feature-card::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 2px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #0b182b,
+      #040b15
+    );
+
+  z-index: -1;
+}
+
+
+@keyframes electricRotate {
+
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* Electric glow */
+
+.electric-border {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #7dd3fc,
+      transparent
+    );
+
+  opacity: 0.7;
+
+  animation:
+    pulseLine 2.5s ease-in-out infinite;
+}
+
+
+@keyframes pulseLine {
+
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+
+    box-shadow:
+      0 0 15px #7dd3fc;
+  }
+
+}
+
+
+/* Card hover */
+
+.feature-card:hover {
+  transform:
+    translateY(-9px);
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(125, 211, 252, 0.1);
+}
+
+
+/* Icon */
+
+.feature-icon {
+  width: 55px;
+
+  height: 55px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 28px;
+
+  border-radius: 14px;
+
+  border: 1px solid rgba(125, 211, 252, 0.25);
+
+  background:
+    rgba(125, 211, 252, 0.06);
+
+  color: #7dd3fc;
+
+  font-size: 25px;
+
+  box-shadow:
+    inset 0 0 20px rgba(125, 211, 252, 0.04);
+}
+
+
+.feature-card h3 {
+  margin: 0 0 14px;
+
+  color: #ffffff;
+
+  font-size: 21px;
+
+  font-weight: 600;
+}
+
+
+.feature-card p {
+  margin: 0;
+
+  max-width: 330px;
+
+  color: rgba(215, 228, 240, 0.58);
+
+  line-height: 1.7;
+
+  font-size: 15px;
+}
+
+
+/* Number */
+
+.feature-number {
+  position: absolute;
+
+  right: 25px;
+
+  bottom: 20px;
+
+  color: rgba(125, 211, 252, 0.15);
+
+  font-size: 50px;
+
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+
+/* Features bottom */
+
+.features-bottom {
+  display: flex;
+
+  justify-content: center;
+
+  margin-top: 70px;
+}
+
+
+/* Outline button */
+/* CHANGED: added the same light-beam sweep as the main explore
+   button (scoped with its own z-index layers) so both CTA styles
+   feel like one cohesive, "shine on hover" system. */
+
+.outline-explore-button {
+  position: relative;
+
+  isolation: isolate;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 22px;
+
+  padding:
+    16px 25px;
+
+  border: 1px solid rgba(125, 211, 252, 0.4);
+
+  border-radius: 8px;
+
+  background:
+    rgba(125, 211, 252, 0.04);
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  transition:
+    all 0.3s ease;
+}
+
+
+.outline-explore-button::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -60%;
+
+  width: 45%;
+
+  height: 100%;
+
+  z-index: 0;
+
+  background:
+    linear-gradient(
+      100deg,
+      transparent,
+      rgba(125, 211, 252, 0.35),
+      transparent
+    );
+
+  transform: skewX(-20deg);
+
+  transition:
+    left 0.85s ease;
+}
+
+
+.outline-explore-button:hover {
+  border-color: #7dd3fc;
+
+  background:
+    rgba(125, 211, 252, 0.1);
+
+  box-shadow:
+    0 0 25px rgba(125, 211, 252, 0.12);
+
+  transform:
+    translateY(-3px);
+}
+
+
+.outline-explore-button:hover::before {
+  left: 150%;
+}
+
+
+.outline-explore-button-label {
+  position: relative;
+
+  z-index: 1;
+}
+
+
+.outline-explore-button span {
+  position: relative;
+
+  z-index: 1;
+
+  font-size: 21px;
+}
+
+
+/* =========================================================
+   FAQ
+   ========================================================= */
+
+.faq-section {
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(20, 50, 80, 0.12),
+      transparent 50%
+    ),
+    #00060f;
+}
+
+
+.faq-container {
+  width: min(950px, 100%);
+
+  margin: 0 auto;
+}
+
+
+/* FAQ card */
+
+.faq-card {
+  position: relative;
+
+  margin-bottom: 18px;
+
+  background:
+    rgba(7, 16, 29, 0.8);
+
+  border:
+    1px solid rgba(125, 211, 252, 0.12);
+
+  border-radius: 6px;
+
+  overflow: hidden;
+
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease,
+    transform 0.4s ease;
+}
+
+
+.faq-card:hover {
+  background:
+    rgba(10, 24, 42, 0.95);
+
+  border-color:
+    rgba(125, 211, 252, 0.25);
+
+  transform:
+    translateX(5px);
+}
+
+
+.faq-card.faq-open {
+  border-color:
+    rgba(125, 211, 252, 0.35);
+
+  background:
+    rgba(10, 23, 40, 0.95);
+
+  box-shadow:
+    0 0 25px rgba(125, 211, 252, 0.06);
+}
+
+
+/* =========================================================
+   FAQ ELECTRIC CORNERS
+   CHANGED: corners now grow to 100% width/height instead of a
+   fixed 65px square. The top-left corner's border-top +
+   border-left then spans the full top edge and full left edge;
+   the bottom-right corner's border-bottom + border-right spans
+   the full bottom and right edges. Together they sweep all the
+   way around the card instead of stopping partway.
+   ========================================================= */
+
+.faq-corner {
+  position: absolute;
+
+  width: 38px;
+
+  height: 38px;
+
+  pointer-events: none;
+
+  transition:
+    width 0.55s ease,
+    height 0.55s ease,
+    box-shadow 0.55s ease;
+}
+
+
+.faq-corner-top {
+  top: 0;
+  left: 0;
+
+  border-top:
+    2px solid #7dd3fc;
+
+  border-left:
+    2px solid #7dd3fc;
+
+  box-shadow:
+    -4px -4px 16px rgba(125, 211, 252, 0.3);
+}
+
+
+.faq-corner-bottom {
+  right: 0;
+  bottom: 0;
+
+  border-right:
+    2px solid #7dd3fc;
+
+  border-bottom:
+    2px solid #7dd3fc;
+
+  box-shadow:
+    4px 4px 16px rgba(125, 211, 252, 0.3);
+}
+
+
+.faq-card:hover .faq-corner,
+.faq-card.faq-open .faq-corner {
+  width: 100%;
+
+  height: 100%;
+}
+
+
+/* =========================================================
+   FAQ QUESTION
+   ========================================================= */
+
+.faq-question {
+  width: 100%;
+
+  min-height: 85px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 25px;
+
+  padding:
+    24px 30px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.faq-question span:first-child {
+  font-size: 18px;
+
+  font-weight: 500;
+}
+
+
+.faq-plus {
+  flex-shrink: 0;
+
+  width: 32px;
+
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border:
+    1px solid rgba(125, 211, 252, 0.25);
+
+  border-radius: 50%;
+
+  color: #7dd3fc;
+
+  font-size: 24px;
+
+  font-weight: 300;
+
+  transition:
+    transform 0.35s ease,
+    background 0.35s ease;
+}
+
+
+.faq-plus.rotate {
+  transform:
+    rotate(45deg);
+
+  background:
+    rgba(125, 211, 252, 0.1);
+}
+
+
+/* FAQ answer */
+
+.faq-answer {
+  display: grid;
+
+  grid-template-rows: 0fr;
+
+  transition:
+    grid-template-rows 0.4s ease;
+}
+
+
+.faq-answer p {
+  overflow: hidden;
+
+  margin: 0;
+
+  padding:
+    0 30px;
+
+  color:
+    rgba(215, 228, 240, 0.58);
+
+  line-height: 1.8;
+
+  font-size: 15px;
+
+  opacity: 0;
+
+  transition:
+    opacity 0.35s ease,
+    padding 0.35s ease;
+}
+
+
+.faq-answer.show {
+  grid-template-rows: 1fr;
+}
+
+
+.faq-answer.show p {
+  padding:
+    0 30px 28px;
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   FINAL CTA
+   ========================================================= */
+
+.final-cta {
+  position: relative;
+
+  width: min(950px, 100%);
+
+  margin:
+    130px auto 0;
+
+  padding:
+    90px 40px;
+
+  text-align: center;
+
+  border:
+    1px solid rgba(125, 211, 252, 0.15);
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(9, 22, 39, 0.9),
+      rgba(3, 9, 17, 0.9)
+    );
+}
+
+
+.final-glow {
+  position: absolute;
+
+  width: 350px;
+
+  height: 350px;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(56, 189, 248, 0.1),
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+
+.final-cta h2 {
+  position: relative;
+
+  margin: 0 auto;
+
+  max-width: 750px;
+
+  color: #ffffff;
+
+  font-size: clamp(
+    35px,
+    5vw,
+    62px
+  );
+
+  line-height: 1.1;
+
+  font-weight: 300;
+
+  letter-spacing: -2px;
+}
+
+
+.final-cta > p:not(.section-label) {
+  position: relative;
+
+  max-width: 600px;
+
+  margin:
+    25px auto 0;
+
+  color:
+    rgba(215, 228, 240, 0.58);
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.landing-footer {
+  min-height: 180px;
+
+  padding:
+    50px clamp(25px, 8vw, 120px);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 30px;
+
+  background: #00040a;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+.landing-footer h3 {
+  margin: 0 0 8px;
+
+  font-size: 22px;
+}
+
+
+.landing-footer p {
+  margin: 0;
+
+  color:
+    rgba(215, 228, 240, 0.45);
+
+  font-size: 14px;
+}
+
+
+.footer-copy {
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .landing-header {
+    height: 80px;
+
+    padding:
+      0 24px;
+  }
+
+
+  .landing-nav {
+    gap: 18px;
+
+    margin-right: 20px;
+  }
+
+
+  .landing-nav button {
+    font-size: 14px;
+  }
+
+
+  .language-select-wrapper {
+    min-width: 90px;
+
+    padding: 8px 10px;
+  }
+
+
+  .hero-content h1 {
+    letter-spacing: -3px;
+  }
+
+
+  .feature-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .landing-header {
+    height: 72px;
+
+    padding:
+      0 18px;
+  }
+
+
+  .landing-logo {
+    font-size: 21px;
+  }
+
+
+  .landing-nav {
+    display: none;
+  }
+
+
+  .language-select-wrapper {
+    min-width: 80px;
+
+    padding: 7px 9px;
+  }
+
+
+  .language-selector {
+    font-size: 13px;
+  }
+
+
+  .language-icon {
+    width: 15px;
+
+    height: 15px;
+  }
+
+
+  .hero-content {
+    margin-top: 90px;
+  }
+
+
+  .hero-label {
+    margin-bottom: 25px;
+
+    font-size: 10px;
+
+    letter-spacing: 3px;
+  }
+
+
+  .hero-content h1 {
+    font-size:
+      clamp(45px, 14vw, 70px);
+
+    letter-spacing: -3px;
+  }
+
+
+  .hero-description {
+    margin-top: 30px;
+
+    font-size: 15px;
+  }
+
+
+  .explore-button {
+    min-width: 240px;
+
+    padding:
+      17px 20px;
+
+    font-size: 15px;
+  }
+
+
+  .features-section,
+  .faq-section {
+    padding:
+      100px 18px;
+  }
+
+
+  .section-heading {
+    margin-bottom: 50px;
+  }
+
+
+  .section-heading h2 {
+    font-size: 42px;
+  }
+
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+
+  .feature-card {
+    min-height: 230px;
+
+    padding: 28px;
+  }
+
+
+  .faq-question {
+    padding:
+      20px;
+
+    min-height: 75px;
+  }
+
+
+  .faq-question span:first-child {
+    font-size: 16px;
+  }
+
+
+  .faq-answer.show p {
+    padding:
+      0 20px 22px;
+  }
+
+
+  .final-cta {
+    padding:
+      65px 25px;
+
+    margin-top: 80px;
+  }
+
+
+  .landing-footer {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    padding:
+      40px 25px;
+  }
+
+}
