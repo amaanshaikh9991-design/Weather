@@ -92,7 +92,45 @@ export default function Advisory() {
 
   const today = daily[0];
   const tomorrow = daily[1];
+  const rainChance = today?.precipitationProbability ?? 0;
+  const temp = current.temperature;
   const cards: AdvisoryCard[] = [];
+
+  const farmGuidance = [
+    {
+      icon: Sprout,
+      title: "Field work window",
+      text:
+        rainChance >= 60
+          ? "Prioritize drainage checks and postpone spraying or fertilizer application until leaves are dry."
+          : current.windGusts >= 35
+            ? "Use sheltered morning hours for field work and secure nursery sheets before gusts strengthen."
+            : "Conditions are suitable for routine field work. Check soil moisture before irrigation.",
+      color: "#22c55e",
+    },
+    {
+      icon: Droplets,
+      title: "Irrigation decision",
+      text:
+        rainChance >= 50
+          ? `Rain probability is ${rainChance}%. Inspect soil first and avoid routine irrigation if rain arrives.`
+          : current.humidity >= 75
+            ? "Humidity is high. Water at the root zone early, avoid wetting foliage, and watch for fungal symptoms."
+            : "Use a soil-moisture check before watering. Early morning irrigation reduces evaporation.",
+      color: "#06b6d4",
+    },
+    {
+      icon: ThermometerSun,
+      title: "Crop and livestock stress",
+      text:
+        temp >= 35
+          ? "Provide shade, clean drinking water, and shorter work periods for livestock and field workers."
+          : temp <= 10
+            ? "Protect temperature-sensitive crops and provide dry shelter for livestock overnight."
+            : "Thermal stress is currently limited; continue normal crop and livestock checks.",
+      color: "#f59e0b",
+    },
+  ];
 
   /* ---------------------------------
      UV / Sun protection
@@ -125,41 +163,6 @@ export default function Advisory() {
       ],
     });
 
-    const farmGuidance = [
-      {
-        icon: Sprout,
-        title: "Field work window",
-        text:
-          rainChance >= 60
-            ? "Prioritize drainage checks and postpone spraying or fertilizer application until leaves are dry."
-            : current.windGusts >= 35
-              ? "Use sheltered morning hours for field work and secure nursery sheets before gusts strengthen."
-              : "Conditions are suitable for routine field work. Check soil moisture before irrigation.",
-        color: "#22c55e",
-      },
-      {
-        icon: Droplets,
-        title: "Irrigation decision",
-        text:
-          rainChance >= 50
-            ? `Rain probability is ${rainChance}%. Inspect soil first and avoid routine irrigation if rain arrives.`
-            : current.humidity >= 75
-              ? "Humidity is high. Water at the root zone early, avoid wetting foliage, and watch for fungal symptoms."
-              : "Use a soil-moisture check before watering. Early morning irrigation reduces evaporation.",
-        color: "#06b6d4",
-      },
-      {
-        icon: ThermometerSun,
-        title: "Crop and livestock stress",
-        text:
-          temp >= 35
-            ? "Provide shade, clean drinking water, and shorter work periods for livestock and field workers."
-            : temp <= 10
-              ? "Protect temperature-sensitive crops and provide dry shelter for livestock overnight."
-              : "Thermal stress is currently limited; continue normal crop and livestock checks.",
-        color: "#f59e0b",
-      },
-    ];
   } else if (current.uvIndex >= 4) {
     cards.push({
       icon: Sun,
@@ -206,8 +209,6 @@ export default function Advisory() {
   /* ---------------------------------
      Rain / Umbrella
   ---------------------------------- */
-
-  const rainChance = today?.precipitationProbability ?? 0;
 
   cards.push({
     icon: Umbrella,
@@ -311,8 +312,6 @@ export default function Advisory() {
   /* ---------------------------------
      Clothing
   ---------------------------------- */
-
-  const temp = current.temperature;
 
   cards.push({
     icon: Shirt,

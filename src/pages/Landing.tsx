@@ -365,9 +365,12 @@ export default function Landing() {
   const [scrollY, setScrollY] =
     useState(0);
 
-  const [locationPromptOpen, setLocationPromptOpen] = useState(true);
+  const [locationPromptOpen, setLocationPromptOpen] = useState(false);
   const [locationRequesting, setLocationRequesting] = useState(false);
   const [locationError, setLocationError] = useState("");
+  const [locationGranted, setLocationGranted] = useState(() =>
+    Boolean(localStorage.getItem("weathergpt_location"))
+  );
 
 
   const backgrounds = [
@@ -463,9 +466,18 @@ export default function Landing() {
 
 
   /*
-    Go to the actual WeatherGPT application.
+    Ask for location the first time the user chooses to explore.
+    Once location has been granted, the next Explore action opens the app.
   */
-  const openDashboard = () => setLocationPromptOpen(true);
+  const openDashboard = () => {
+    if (locationGranted || localStorage.getItem("weathergpt_location")) {
+      navigate("/dashboard");
+      return;
+    }
+
+    setLocationError("");
+    setLocationPromptOpen(true);
+  };
 
   const continueWithLocation = () => {
     if (!navigator.geolocation) {
@@ -480,7 +492,9 @@ export default function Landing() {
           "weathergpt_location",
           JSON.stringify({ lat: position.coords.latitude, lon: position.coords.longitude })
         );
-        navigate("/dashboard");
+        setLocationGranted(true);
+        setLocationRequesting(false);
+        setLocationPromptOpen(false);
       },
       () => {
         setLocationRequesting(false);
