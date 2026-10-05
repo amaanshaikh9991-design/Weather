@@ -8,20 +8,6 @@ interface ChatWeatherContext {
   airQuality: AirQuality | null;
 }
 
-export interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  text: string;
-}
-
-export async function loadChatHistory(): Promise<ChatMessage[]> {
-  const response = await fetch("/api/chat");
-  const data = await readApiResponse(response);
-  if (!response.ok) throw new Error(data.error ?? "Unable to load chat history.");
-  if (!Array.isArray(data.messages)) throw new Error("The chat history response was invalid.");
-  return data.messages;
-}
-
 export async function sendChatMessage(
   message: string,
   weather: ChatWeatherContext,
@@ -38,7 +24,7 @@ export async function sendChatMessage(
   return data.response;
 }
 
-async function readApiResponse(response: Response): Promise<{ error?: string; messages?: ChatMessage[]; response?: string }> {
+async function readApiResponse(response: Response): Promise<{ error?: string; response?: string }> {
   const contentType = response.headers.get("content-type") ?? "";
   const body = await response.text();
 
@@ -51,7 +37,7 @@ async function readApiResponse(response: Response): Promise<{ error?: string; me
   }
 
   try {
-    return JSON.parse(body) as { error?: string; messages?: ChatMessage[]; response?: string };
+    return JSON.parse(body) as { error?: string; response?: string };
   } catch {
     throw new Error("The chat service returned invalid JSON.");
   }

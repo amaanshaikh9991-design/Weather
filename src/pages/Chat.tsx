@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { Send, Mic, Sparkles, Droplets, Wind, Gauge, Sun } from "lucide-react";
 import { useWeather } from "../context/WeatherContext";
-import { loadChatHistory, sendChatMessage } from "../services/chatApi";
+import { sendChatMessage } from "../services/chatApi";
 import { fetchOfficialAlerts } from "../services/alertsApi";
 import WeatherIcon from "../components/WeatherIcon";
 import { describeWeatherCode } from "../services/weatherApi";
@@ -10,6 +11,120 @@ interface Message {
   id: number;
   role: "user" | "bot";
   text: string;
+}
+
+function formatInline(text: string): ReactNode[] {
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index} className="font-semibold text-[color:var(--wx-text)]">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={index} className="rounded bg-black/20 px-1.5 py-0.5 text-[0.9em] text-cyan-300">{part.slice(1, -1)}</code>;
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
+function isTableRow(line: string): boolean {
+  return line.includes("|") && line.split("|").length >= 3;
+}
+
+function isTableDivider(line: string): boolean {
+  return isTableRow(line) && line.replace(/[|\s:-]/g, "") === "";
+}
+
+function tableCells(line: string): string[] {
+  return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+}
+
+function FormattedMessage({ text }: { text: string }) {
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  const blocks: ReactNode[] = [];
+  let paragraph: string[] = [];
+  let index = 0;
+
+  const flushParagraph = () => {
+    if (paragraph.length === 0) return;
+    blocks.push(
+      <p key={`paragraph-${index++}`} className="whitespace-pre-wrap">
+        {formatInline(paragraph.join(" "))}
+      </p>
+    );
+    paragraph = [];
+  };
+
+  while (index < lines.length) {
+    const line = lines[index].trim();
+
+    if (!line) {
+      flushParagraph();
+      index += 1;
+      continue;
+    }
+
+    if (isTableRow(line) && index + 1 < lines.length && isTableDivider(lines[index + 1])) {
+      flushParagraph();
+      const headers = tableCells(line);
+      const rows: string[][] = [];
+      index += 2;
+      while (index < lines.length && isTableRow(lines[index])) {
+        if (!isTableDivider(lines[index])) rows.push(tableCells(lines[index]));
+        index += 1;
+      }
+      blocks.push(
+        <div key={`table-${index}`} className="my-3 overflow-x-auto rounded-lg border border-white/10">
+          <table className="w-full min-w-[520px] border-collapse text-left text-xs">
+            <thead className="bg-white/[0.06] text-slate-200">
+              <tr>{headers.map((cell, cellIndex) => <th key={cellIndex} className="border-b border-white/10 px-3 py-2 font-semibold">{formatInline(cell)}</th>)}</tr>
+            </thead>
+            <tbody>
+              {rows.map((row, rowIndex) => (
+                <tr key={rowIndex} className="border-b border-white/5 last:border-0">
+                  {headers.map((_, cellIndex) => <td key={cellIndex} className="px-3 py-2 align-top text-slate-300">{formatInline(row[cellIndex] ?? "")}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+      continue;
+    }
+
+    const heading = line.match(/^#{1,3}\s+(.+)$/);
+    if (heading) {
+      flushParagraph();
+      blocks.push(<h4 key={`heading-${index++}`} className="mt-3 font-semibold text-cyan-200">{formatInline(heading[1])}</h4>);
+      index += 1;
+      continue;
+    }
+
+    const listItem = line.match(/^(?:[-*•]|\d+\.)\s+(.+)$/);
+    if (listItem) {
+      flushParagraph();
+      const ordered = /^\d+\./.test(line);
+      const items: string[] = [];
+      while (index < lines.length) {
+        const match = lines[index].trim().match(ordered ? /^\d+\.\s+(.+)$/ : /^(?:[-*•])\s+(.+)$/);
+        if (!match) break;
+        items.push(match[1]);
+        index += 1;
+      }
+      const List = ordered ? "ol" : "ul";
+      blocks.push(
+        <List key={`list-${index}`} className={`my-2 space-y-1 pl-5 ${ordered ? "list-decimal" : "list-disc"}`}>
+          {items.map((item, itemIndex) => <li key={itemIndex}>{formatInline(item)}</li>)}
+        </List>
+      );
+      continue;
+    }
+
+    paragraph.push(line);
+    index += 1;
+  }
+
+  flushParagraph();
+  return <div className="space-y-2">{blocks}</div>;
 }
 
 const SUGGESTIONS = [
@@ -41,26 +156,6 @@ export default function Chat() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(2);
-
-  useEffect(() => {
-    loadChatHistory()
-      .then((history) => {
-        if (history.length > 0) {
-          setMessages(
-            history.map((message, index) => ({
-              id: index + 1,
-              role: message.role === "user" ? "user" : "bot",
-              text: message.text,
-            }))
-          );
-          idRef.current = history.length + 1;
-        }
-      })
-      .catch((loadError) => {
-        console.error("Chat history error:", loadError);
-        setError("Your private chat history could not be loaded.");
-      });
-  }, []);
 
   useEffect(() => {
     if (!location) return;
@@ -184,7 +279,7 @@ export default function Chat() {
                     : "wx-bubble-bot text-[color:var(--wx-text)]"
                 }`}
               >
-                {m.text}
+                {m.role === "bot" ? <FormattedMessage text={m.text} /> : m.text}
               </div>
             </div>
           ))}

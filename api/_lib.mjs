@@ -68,62 +68,70 @@ export async function fetchOfficialAlerts(latitude, longitude) {
   const alerts = [];
 
   if (latitude >= 24.396 && latitude <= 49.384 && longitude >= -125 && longitude <= -66.5) {
-    const response = await fetch(
-      `https://api.weather.gov/alerts/active?point=${encodeURIComponent(`${latitude},${longitude}`)}`,
-      { headers: { "User-Agent": "WeatherGPT/1.0 weather-alerts" } }
-    );
-    const contentType = response.headers.get("content-type") ?? "";
+    try {
+      const response = await fetch(
+        `https://api.weather.gov/alerts/active?point=${encodeURIComponent(`${latitude},${longitude}`)}`,
+        { headers: { "User-Agent": "WeatherGPT/1.0 weather-alerts" } }
+      );
+      const contentType = response.headers.get("content-type") ?? "";
 
-    if (response.ok && contentType.includes("application/json")) {
-      const data = await response.json();
-      for (const feature of data.features ?? []) {
-        const properties = feature.properties ?? {};
-        alerts.push({
-          id: `nws-${properties.id ?? randomUUID()}`,
-          type: properties.event ?? "Weather alert",
-          title: properties.headline ?? properties.event ?? "Official weather alert",
-          severity: severityFromText(`${properties.severity} ${properties.urgency} ${properties.event}`),
-          latitude,
-          longitude,
-          affectedArea: properties.areaDesc ?? "Point location",
-          issuedAt: properties.sent ?? new Date().toISOString(),
-          expiresAt: properties.expires ?? undefined,
-          source: "US National Weather Service",
-          sourceUrl: properties.web ?? properties["@id"],
-          description: properties.description ?? properties.instruction ?? "",
-        });
+      if (response.ok && contentType.includes("application/json")) {
+        const data = await response.json();
+        for (const feature of data.features ?? []) {
+          const properties = feature.properties ?? {};
+          alerts.push({
+            id: `nws-${properties.id ?? randomUUID()}`,
+            type: properties.event ?? "Weather alert",
+            title: properties.headline ?? properties.event ?? "Official weather alert",
+            severity: severityFromText(`${properties.severity} ${properties.urgency} ${properties.event}`),
+            latitude,
+            longitude,
+            affectedArea: properties.areaDesc ?? "Point location",
+            issuedAt: properties.sent ?? new Date().toISOString(),
+            expiresAt: properties.expires ?? undefined,
+            source: "US National Weather Service",
+            sourceUrl: properties.web ?? properties["@id"],
+            description: properties.description ?? properties.instruction ?? "",
+          });
+        }
       }
+    } catch (error) {
+      console.warn("NWS alerts feed unavailable:", error);
     }
   }
 
-  const gdacsResponse = await fetch("https://www.gdacs.org/xml/rss.xml");
-  if (gdacsResponse.ok) {
-    const xml = await gdacsResponse.text();
-    for (const item of xml.match(/<item[\s\S]*?<\/item>/gi) ?? []) {
-      const point = xmlValue(item, "georss:point").split(/\s+/).map(Number);
-      if (
-        point.length !== 2 ||
-        point.some(Number.isNaN) ||
-        distanceKm(latitude, longitude, point[0], point[1]) > 1000
-      ) {
-        continue;
+  try {
+    const gdacsResponse = await fetch("https://www.gdacs.org/xml/rss.xml");
+    if (gdacsResponse.ok) {
+      const xml = await gdacsResponse.text();
+      for (const item of xml.match(/<item[\s\S]*?<\/item>/gi) ?? []) {
+        const point = xmlValue(item, "georss:point").split(/\s+/).map(Number);
+        if (
+          point.length !== 2 ||
+          point.some(Number.isNaN) ||
+          distanceKm(latitude, longitude, point[0], point[1]) > 1000
+        ) {
+          continue;
+        }
+        const title = xmlValue(item, "title");
+        const description = stripHtml(xmlValue(item, "description"));
+        alerts.push({
+          id: `gdacs-${xmlValue(item, "guid") || title}`,
+          type: title.split(":")[0] || "Global disaster event",
+          title,
+          severity: severityFromText(`${title} ${description}`),
+          latitude: point[0],
+          longitude: point[1],
+          affectedArea: "Within approximately 1,000 km of the selected location",
+          issuedAt: xmlValue(item, "pubDate") || new Date().toISOString(),
+          source: "GDACS (UN) global disaster monitoring",
+          sourceUrl: xmlValue(item, "link"),
+          description,
+        });
       }
-      const title = xmlValue(item, "title");
-      const description = stripHtml(xmlValue(item, "description"));
-      alerts.push({
-        id: `gdacs-${xmlValue(item, "guid") || title}`,
-        type: title.split(":")[0] || "Global disaster event",
-        title,
-        severity: severityFromText(`${title} ${description}`),
-        latitude: point[0],
-        longitude: point[1],
-        affectedArea: "Within approximately 1,000 km of the selected location",
-        issuedAt: xmlValue(item, "pubDate") || new Date().toISOString(),
-        source: "GDACS (UN) global disaster monitoring",
-        sourceUrl: xmlValue(item, "link"),
-        description,
-      });
     }
+  } catch (error) {
+    console.warn("GDACS alerts feed unavailable:", error);
   }
 
   return alerts.slice(0, 20);
