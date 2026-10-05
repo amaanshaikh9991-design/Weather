@@ -84,7 +84,8 @@ async function fetchOfficialAlerts(latitude, longitude) {
       `https://api.weather.gov/alerts/active?point=${encodeURIComponent(`${latitude},${longitude}`)}`,
       { headers: { "User-Agent": "WeatherGPT/1.0 weather-alerts" } }
     );
-    if (response.ok) {
+    const contentType = response.headers.get("content-type") ?? "";
+    if (response.ok && contentType.includes("application/json")) {
       const data = await response.json();
       for (const feature of data.features ?? []) {
         const properties = feature.properties ?? {};
@@ -103,6 +104,8 @@ async function fetchOfficialAlerts(latitude, longitude) {
           description: properties.description ?? properties.instruction ?? "",
         });
       }
+    } else if (!response.ok) {
+      console.warn("Official NWS alerts request failed:", response.status);
     }
   }
 
