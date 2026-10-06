@@ -5,8 +5,18 @@ const COOKIE_NAME = "weather_session";
 const MAX_MESSAGES = 40;
 
 export function sendJson(response, status, body, headers = {}) {
-  response.status(status).set({ "Content-Type": "application/json; charset=utf-8", ...headers });
-  return response.json(body);
+  response.statusCode = status;
+
+  response.setHeader(
+    "Content-Type",
+    "application/json; charset=utf-8"
+  );
+
+  for (const [key, value] of Object.entries(headers)) {
+    response.setHeader(key, value);
+  }
+
+  return response.end(JSON.stringify(body));
 }
 
 function parseCookies(cookieHeader = "") {
